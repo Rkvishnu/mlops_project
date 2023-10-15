@@ -1,1 +1,1 @@
-# MLops pipeline for a basic machine learning project
+# MLops Pipeline for a basic machine learning project
