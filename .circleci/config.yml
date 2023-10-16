@@ -23,9 +23,9 @@ jobs:
            command: pip install -r requirements.txt
       - run: python test_model.py 
 
-  deploy:
-    docker:
-    - image: cimg/aws-cli:2.6.0
+ deploy:
+   docker:
+    - image: amazon/aws-cli:2.6.4
 
     steps:
       - checkout
