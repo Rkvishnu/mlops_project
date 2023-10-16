@@ -13,6 +13,7 @@ jobs:
           name: Install Dependencies
           command: pip install -r requirements.txt
       - run: python mlops_model.py
+
   test:
     docker:
       - image: cimg/python:3.10
@@ -25,50 +26,36 @@ jobs:
 
   deploy:
     environment:
-      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-      CIRCLECI_SSH_KEY: $CIRCLECI_SSH_KEY
     docker:
-    - image: cimg/base:2023.04
-
+      - image: cimg/base:2023.04
     steps:
       - checkout
       - setup_remote_docker
       - aws-cli/setup:
           region: us-east-1
-
       - run:
           name: Build Docker image
           command: docker build -t mlops_project .
-
       - run:
           name: Push Docker image to Docker Hub
           command: |
             docker tag mlops_project $DOCKERHUB_USERNAME/mlops_project:latest
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
             docker push $DOCKERHUB_USERNAME/mlops_project:latest
-
-        # Install SSH Client
       - run:
           name: Install SSH Client
-          command: sudo apt-get update && sudo apt-get install openssh-client
-
-      # Connect to EC2 Instance
+          command: sudo apt-get update && sudo apt-get install -y openssh-client
       - run:
           name: Connect to EC2 Instance
-          command: ssh -i ~/.ssh/circleci_ssh_key circleci@43.204.141.230
-
-      # Install Docker on EC2 Instance
+          command: ssh -i /home/circleci/.ssh/circleci_ssh_key circleci@43.204.141.230
       - run:
           name: Install Docker on EC2 Instance
-          command: sudo apt-get update && sudo apt-get install docker.io
-
-      # Pull Docker Image from Docker Hub
+          command: sudo apt-get update && sudo apt-get install -y docker-ce
       - run:
           name: Pull Docker Image from Docker Hub
           command: docker pull $DOCKERHUB_USERNAME/mlops_project:latest
-
-      # Run Docker Container
       - run:
           name: Run Docker Container
           command: docker run -d -p 8080:8080 $DOCKERHUB_USERNAME/mlops_project:latest
@@ -86,4 +73,4 @@ workflows:
             - test
           filters:
             branches:
-              only: main 
+              only: main
