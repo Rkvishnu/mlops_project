@@ -24,6 +24,9 @@ jobs:
       - run: python test_model.py 
 
   deploy:
+    environment:
+      AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY
+      AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
     docker:
     - image: amazon/aws-cli:2.6.4
 
