@@ -33,7 +33,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-        version: 24.0.6
+          version: 24.0.6
       - aws-cli/setup:
           region: us-east-1
 
