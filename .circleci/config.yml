@@ -28,7 +28,7 @@ jobs:
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
     docker:
-    - image: amazon/aws-cli:2.6.4
+    - image: cimg/base:2023.04
 
     steps:
       - checkout
