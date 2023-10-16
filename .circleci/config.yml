@@ -43,8 +43,8 @@ jobs:
       - run:
           name: Push Docker image to Docker Hub
           command: |
-            echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
             docker tag mlops_project $DOCKERHUB_USERNAME/mlops_project:latest
+            docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
             docker push $DOCKERHUB_USERNAME/mlops_project:latest
 
       - run:
