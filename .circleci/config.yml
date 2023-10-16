@@ -30,7 +30,6 @@ jobs:
     steps:
       - checkout
       - aws-cli/setup:
-          profile-name: default
           region: us-east-1
 
       - run:
