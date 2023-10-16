@@ -49,7 +49,11 @@ jobs:
           command: sudo apt-get update && sudo apt-get install -y openssh-client
       - run:
           name: Connect to EC2 Instance
-          command: ssh -i /home/circleci/.ssh/circleci_ssh_key circleci@43.204.141.230
+          command: |
+            ssh-agent
+            ssh-add /home/circleci/.ssh/circleci_ssh_key
+            ssh -i /home/circleci/.ssh/circleci_ssh_key circleci@43.204.141.230
+
       - run:
           name: Install Docker on EC2 Instance
           command: sudo apt-get update && sudo apt-get install -y docker-ce
