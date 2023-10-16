@@ -34,8 +34,7 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - aws-cli/setup:
-          region: us-east-1
+     
       - run:
           name: Build Docker image
           command: docker build -t mlops_project .
