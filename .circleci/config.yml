@@ -23,8 +23,8 @@ jobs:
            command: pip install -r requirements.txt
       - run: python test_model.py 
 
- deploy:
-   docker:
+  deploy:
+    docker:
     - image: amazon/aws-cli:2.6.4
 
     steps:
