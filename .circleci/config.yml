@@ -27,6 +27,7 @@ jobs:
     environment:
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      CIRCLECI_SSH_KEY: $CIRCLECI_SSH_KEY
       
     docker:
       - image: cimg/base:2023.04
@@ -49,9 +50,9 @@ jobs:
       - run:
           name: Deploy to EC2
           command: |
-            ssh -i ~/.ssh/circleci_ssh_key ubuntu@43.204.141.230 "docker pull $DOCKERHUB_USERNAME/mlops_project:latest"
-            ssh -i ~/.ssh/circleci_ssh_key ubuntu@43.204.141.230 "docker stop mlops_project || true && docker rm mlops_project || true"
-            ssh -i ~/.ssh/circleci_ssh_key ubuntu@43.204.141.230 "docker run -d -p 80:80 mlops_project:latest"
+            ssh -i $CIRCLECI_SSH_KEY ubuntu@43.204.141.230 "docker pull $DOCKERHUB_USERNAME/mlops_project:latest"
+            ssh -i $CIRCLECI_SSH_KEY ubuntu@43.204.141.230 "docker stop mlops_project || true && docker rm mlops_project || true"
+            ssh -i $CIRCLECI_SSH_KEY ubuntu@43.204.141.230 "docker run -d -p 80:80 mlops_project:latest"
 
 workflows:
   version: 2
