@@ -1,14 +1,13 @@
 version: 2.1
 
-orbs:
-  aws-cli: circleci/aws-cli@4.1.1
-
 jobs:
   build:
     docker:
       - image: cimg/python:3.10
+      - image: cimg/base:2023.04
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: Install Dependencies
           command: pip install -r requirements.txt
@@ -28,6 +27,8 @@ jobs:
     environment:
       AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
       AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+      EC2_INSTANCE_IP: $EC2_INSTANCE_IP
+      PRIVATE_KEY: $PRIVATE_KEY
     docker:
       - image: cimg/base:2023.04
     steps:
@@ -44,29 +45,19 @@ jobs:
             docker tag mlops_project $DOCKERHUB_USERNAME/mlops_project:latest
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
             docker push $DOCKERHUB_USERNAME/mlops_project:latest
+      - add_ssh_keys:
+          fingerprints:
+            - "1Cl/ZwMCqW6VslHJuSH/p5Z4QMZ2ubv5jbpjK0K3L5g"
       - run:
-          name: Install SSH Client
-          command: sudo apt-get update && sudo apt-get install -y openssh-client
-      - run:
-          name: Connect to EC2 Instance
+          name: Deploy to EC2
           command: |
-            ssh-agent
-            ssh-add /home/circleci/.ssh/circleci_ssh_key
-            ssh -i /home/circleci/.ssh/circleci_ssh_key circleci@43.204.141.230
-
-      - run:
-          name: Install Docker on EC2 Instance
-          command: sudo apt-get update && sudo apt-get install -y docker-ce
-      - run:
-          name: Pull Docker Image from Docker Hub
-          command: docker pull $DOCKERHUB_USERNAME/mlops_project:latest
-      - run:
-          name: Run Docker Container
-          command: docker run -d -p 8080:8080 $DOCKERHUB_USERNAME/mlops_project:latest
+            ssh -i $PRIVATE_KEY ubuntu@$EC2_INSTANCE_IP "docker pull $DOCKERHUB_USERNAME/mlops_project:latest"
+            ssh -i $PRIVATE_KEY ubuntu@$EC2_INSTANCE_IP "docker stop mlops_project || true && docker rm mlops_project || true"
+            ssh -i $PRIVATE_KEY ubuntu@$EC2_INSTANCE_IP "docker run -d -p 80:80 mlops_modal:latest"
 
 workflows:
   version: 2
-  build_test_and_deploy:
+  build-test-deploy:
     jobs:
       - build
       - test:
@@ -75,6 +66,3 @@ workflows:
       - deploy:
           requires:
             - test
-          filters:
-            branches:
-              only: main
